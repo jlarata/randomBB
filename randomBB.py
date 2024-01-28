@@ -1,5 +1,4 @@
 import shelve
-from openpyxl import Workbook
 import openpyxl
 from random import randrange
 
@@ -39,17 +38,19 @@ def abreLaShelve():
 
 def eligeNumeroAlAzar():
     global numeroAlAzar
+    global libroAlAzar
     #global numeroParaPruebas
     numeroAlAzar = randrange(len(my_shelve["biblioteca"])+1)
+    libroAlAzar = my_shelve["biblioteca"][numeroAlAzar]
     #numeroParaPruebas = 5
 
 def separaIsLeidos():
-    enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos() if my_shelve["biblioteca"][numeroAlAzar].isLeido else comunicaLibroAsignadoAlAzar()
+    enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos() if libroAlAzar.isLeido else comunicaLibroAsignadoAlAzar()
     #enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos() if my_shelve["biblioteca"][numeroParaPruebas].isLeido else comunicaLibroAsignadoAlAzar()
 
 def enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos():
     global BBProvisoriaDeIsLeidos
-    BBProvisoriaDeIsLeidos.append(Libro(my_shelve["biblioteca"][numeroAlAzar].numero, my_shelve["biblioteca"][numeroAlAzar].autor, my_shelve["biblioteca"][numeroAlAzar].titulo, my_shelve["biblioteca"][numeroAlAzar].genero, my_shelve["biblioteca"][numeroAlAzar].seccion, True)) 
+    BBProvisoriaDeIsLeidos.append(Libro(libroAlAzar.numero, libroAlAzar.autor, libroAlAzar.titulo, libroAlAzar.genero, libroAlAzar.seccion, True)) 
     #BBProvisoriaDeIsLeidos.append(Libro(my_shelve["biblioteca"][numeroParaPruebas].numero, my_shelve["biblioteca"][numeroParaPruebas].autor, my_shelve["biblioteca"][numeroParaPruebas].titulo, my_shelve["biblioteca"][numeroParaPruebas].genero, my_shelve["biblioteca"][numeroParaPruebas].seccion, True)) 
     eligeNumeroAlAzar()
     separaIsLeidos()
@@ -64,7 +65,7 @@ def comunicaLibroAsignadoAlAzar():
     comunicaLosLibrosLeidosQueSalieron()
     print("...bien, luego te salió sorteado el número "+str(numeroAlAzar)+", al que le corresponde el siguiente libro: ")
     print("")
-    print(" "+(my_shelve["biblioteca"][numeroAlAzar].autor)+", "+(my_shelve["biblioteca"][numeroAlAzar].titulo)+", "+(my_shelve["biblioteca"][numeroAlAzar].genero)+", "+((my_shelve["biblioteca"][numeroAlAzar].seccion)))
+    print(" "+(libroAlAzar.autor)+", "+(libroAlAzar.titulo)+", "+(libroAlAzar.genero)+", "+((libroAlAzar.seccion)))
     print("")
     #print("...bien, te salió sorteado el número "+str(numeroParaPruebas)+", al que le corresponde el siguiente libro: ")
     #print("")
@@ -80,7 +81,7 @@ def comunicaLibroAsignadoAlAzar():
         print(""), print("bueno, elijamos otro..."), print(""), eligeNumeroAlAzar(), separaIsLeidos()
 
 def modificaLibroIsLeido():
-    my_shelve["biblioteca"][numeroAlAzar].isLeido = True
+    libroAlAzar.isLeido = True
 
 def cierraLaShelve():
     my_shelve.close(),
