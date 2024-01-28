@@ -56,10 +56,11 @@ def enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos():
     separaIsLeidos()
 
 def comunicaLosLibrosLeidosQueSalieron():
-    print("...bueno, primero salieron estos libros, que ya leiste")
-    for libro in BBProvisoriaDeIsLeidos:
-        print("   -> "+libro.titulo)
-    print("")
+    if any(BBProvisoriaDeIsLeidos):
+        print("...bueno, primero salieron estos libros, que ya leiste")
+        for libro in BBProvisoriaDeIsLeidos:
+            print("   -> "+libro.titulo)
+        print("")
 
 def comunicaLibroAsignadoAlAzar():
     comunicaLosLibrosLeidosQueSalieron()
