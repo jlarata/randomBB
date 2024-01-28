@@ -1,4 +1,4 @@
-#RandomBB
+# RandomBB
 
 RandomBB is a program to choose randomly a book from your library for you to read.
 If the book has already been read, RandomBB will choose another for you.
