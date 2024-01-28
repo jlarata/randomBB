@@ -3,7 +3,6 @@ from openpyxl import Workbook
 import openpyxl
 from random import randrange
 
-
 #variables de openpyxl
 path = "C:/Users/usuario/Desktop/ariel/Hackerwoman/Proyectos/randomBB/biblioteca.xlsx"
 wb_obj = openpyxl.load_workbook(path)
@@ -21,12 +20,41 @@ class Libro:
         self.isLeido = isLeido
 biblioteca = []
 
-print("")
-input("Hola, vamos a elegir un número al azar y elegir un libro de la biblioteca, presiona enter para continuar")
-print("")
+#funciones
+def saludaAlUsuario():
+    print("")
+    input("Hola, vamos a elegir un número al azar y elegir un libro de la biblioteca, presiona enter para continuar")
+    print("")
+
+def abreLaShelve():
+    global my_shelve
+    my_shelve = shelve.open("mydata.db")
+
+def eligeNumeroAlAzar():
+    global numeroAlAzar
+    numeroAlAzar = randrange(len(my_shelve["biblioteca"])+1)
+
+def comunicaLibroAsignadoAlAzar():
+    print("Bien, te salió sorteado el número "+str(numeroAlAzar)+", al que le corresponde el siguiente libro: ")
+    print("")
+    print(" "+(my_shelve["biblioteca"][numeroAlAzar].autor)+", "+(my_shelve["biblioteca"][numeroAlAzar].titulo)+", "+(my_shelve["biblioteca"][numeroAlAzar].genero)+", "+((my_shelve["biblioteca"][numeroAlAzar].seccion)))
+
+def cierraLaShelve():
+    my_shelve.close()
+
+def despideAlUsuario():
+    print("")
+    input("cerrando el programa, espero que te haya servido. presiona Enter para salir.")
+
+#randomBB
+saludaAlUsuario(),
+abreLaShelve(),
+eligeNumeroAlAzar(),
+comunicaLibroAsignadoAlAzar(),
+cierraLaShelve(),
+despideAlUsuario(),
 
 
-my_shelve = shelve.open("mydata.db")
 
 
 """método general para crear una lista, tomar todos los datos del excel y guardarlos en la shelve
@@ -80,13 +108,3 @@ my_shelve["biblioteca"] = biblioteca
 for libro in my_shelve["biblioteca"]:
     print(str(libro.numero)+", "+(libro.autor)+", "+(libro.titulo)+", "+((my_shelve["y"]).genero)+", "+((my_shelve["y"]).seccion)+", "+str(((my_shelve["y"]).isLeido)))"""
 
-numeroAlAzar = randrange(len(my_shelve["biblioteca"])+1)
-
-print("Bien, te salió sorteado el número "+str(numeroAlAzar)+", al que le corresponde el siguiente libro: ")
-print("")
-print(" "+(my_shelve["biblioteca"][numeroAlAzar].autor)+", "+(my_shelve["biblioteca"][numeroAlAzar].titulo)+", "+(my_shelve["biblioteca"][numeroAlAzar].genero)+", "+((my_shelve["biblioteca"][numeroAlAzar].seccion)))
-
-
-my_shelve.close()
-print("")
-input("cerrando el programa, espero que te haya servido. presiona Enter para salir.")
