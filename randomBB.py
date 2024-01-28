@@ -3,7 +3,7 @@ from openpyxl import Workbook
 import openpyxl
 from random import randrange
 
-#variables de openpyxl
+#variables de openpyxl, no se usan salvo que cambie el excel, en ese caso revisar abajo de todo.
 path = "C:/Users/usuario/Desktop/ariel/Hackerwoman/Proyectos/randomBB/biblioteca.xlsx"
 wb_obj = openpyxl.load_workbook(path)
 sheet_obj = wb_obj.active
@@ -18,7 +18,12 @@ class Libro:
         self.genero = genero
         self.seccion = seccion
         self.isLeido = isLeido
+
 biblioteca = []
+BBProvisoriaDeIsLeidos = []
+
+
+
 
 #funciones
 def saludaAlUsuario():
@@ -28,20 +33,58 @@ def saludaAlUsuario():
 
 def abreLaShelve():
     global my_shelve
-    my_shelve = shelve.open("mydata.db")
+    #el writeback=true supuestamente no es necesario y ralentiza el programa
+    #sin embargo, cuando no lo puse, sencillamente no pude modificar la shelve
+    my_shelve = shelve.open("mydata.db", writeback=True)
 
 def eligeNumeroAlAzar():
     global numeroAlAzar
+    #global numeroParaPruebas
     numeroAlAzar = randrange(len(my_shelve["biblioteca"])+1)
+    #numeroParaPruebas = 5
+
+def separaIsLeidos():
+    enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos() if my_shelve["biblioteca"][numeroAlAzar].isLeido else comunicaLibroAsignadoAlAzar()
+    #enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos() if my_shelve["biblioteca"][numeroParaPruebas].isLeido else comunicaLibroAsignadoAlAzar()
+
+def enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos():
+    global BBProvisoriaDeIsLeidos
+    BBProvisoriaDeIsLeidos.append(Libro(my_shelve["biblioteca"][numeroAlAzar].numero, my_shelve["biblioteca"][numeroAlAzar].autor, my_shelve["biblioteca"][numeroAlAzar].titulo, my_shelve["biblioteca"][numeroAlAzar].genero, my_shelve["biblioteca"][numeroAlAzar].seccion, True)) 
+    #BBProvisoriaDeIsLeidos.append(Libro(my_shelve["biblioteca"][numeroParaPruebas].numero, my_shelve["biblioteca"][numeroParaPruebas].autor, my_shelve["biblioteca"][numeroParaPruebas].titulo, my_shelve["biblioteca"][numeroParaPruebas].genero, my_shelve["biblioteca"][numeroParaPruebas].seccion, True)) 
+    eligeNumeroAlAzar()
+    separaIsLeidos()
+
+def comunicaLosLibrosLeidosQueSalieron():
+    print("...bueno, primero salieron estos libros, que ya leiste")
+    for libro in BBProvisoriaDeIsLeidos:
+        print("   -> "+libro.titulo)
+    print("")
 
 def comunicaLibroAsignadoAlAzar():
-    print("Bien, te salió sorteado el número "+str(numeroAlAzar)+", al que le corresponde el siguiente libro: ")
+    comunicaLosLibrosLeidosQueSalieron()
+    print("...bien, luego te salió sorteado el número "+str(numeroAlAzar)+", al que le corresponde el siguiente libro: ")
     print("")
     print(" "+(my_shelve["biblioteca"][numeroAlAzar].autor)+", "+(my_shelve["biblioteca"][numeroAlAzar].titulo)+", "+(my_shelve["biblioteca"][numeroAlAzar].genero)+", "+((my_shelve["biblioteca"][numeroAlAzar].seccion)))
+    print("")
+    #print("...bien, te salió sorteado el número "+str(numeroParaPruebas)+", al que le corresponde el siguiente libro: ")
+    #print("")
+    #print(" "+(my_shelve["biblioteca"][numeroParaPruebas].autor)+", "+(my_shelve["biblioteca"][numeroParaPruebas].titulo)+", "+(my_shelve["biblioteca"][numeroParaPruebas].genero)+", "+((my_shelve["biblioteca"][numeroParaPruebas].seccion)))
+    
+    yes_choices = ['yes', 'y', 'YES', 'Y', 'Yes', 'Si', 'S', 's', 'si']
+    #no_choices = ['no', 'n', 'No', 'N']
+    indicaSiVaALeer = input("Según la base de datos, aún no has leído este libro. ¿Vas a leerlo ahora? Y/N: ")
+    if indicaSiVaALeer in yes_choices:
+        print(""), print("¡Excelente! Que lo disfrutes."), print(""),
+        modificaLibroIsLeido()
+    else:
+        print(""), print("bueno, elijamos otro..."), print(""), eligeNumeroAlAzar(), separaIsLeidos()
+
+def modificaLibroIsLeido():
+    my_shelve["biblioteca"][numeroAlAzar].isLeido = True
 
 def cierraLaShelve():
-    my_shelve.close()
-
+    my_shelve.close(),
+    
 def despideAlUsuario():
     print("")
     input("cerrando el programa, espero que te haya servido. presiona Enter para salir.")
@@ -50,7 +93,7 @@ def despideAlUsuario():
 saludaAlUsuario(),
 abreLaShelve(),
 eligeNumeroAlAzar(),
-comunicaLibroAsignadoAlAzar(),
+separaIsLeidos(),
 cierraLaShelve(),
 despideAlUsuario(),
 
@@ -107,4 +150,5 @@ my_shelve["biblioteca"] = biblioteca
 ### iprime la lista guardada en la shelve con dos valores: número y autor
 for libro in my_shelve["biblioteca"]:
     print(str(libro.numero)+", "+(libro.autor)+", "+(libro.titulo)+", "+((my_shelve["y"]).genero)+", "+((my_shelve["y"]).seccion)+", "+str(((my_shelve["y"]).isLeido)))"""
+
 
