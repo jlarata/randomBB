@@ -20,8 +20,9 @@ class Libro:
 
 biblioteca = []
 BBProvisoriaDeIsLeidos = []
+numeroAlAzar = 0
 
-
+yes_choices = ['yes', 'y', 'YES', 'Y', 'Yes', 'Si', 'S', 's', 'si']
 
 
 #funciones
@@ -40,17 +41,21 @@ def eligeNumeroAlAzar():
     global numeroAlAzar
     global libroAlAzar
     #global numeroParaPruebas
+    #numeroParaPruebas = 5
+
     numeroAlAzar = randrange(len(my_shelve["biblioteca"])+1)
     libroAlAzar = my_shelve["biblioteca"][numeroAlAzar]
-    #numeroParaPruebas = 5
+    
 
 def separaIsLeidos():
     enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos() if libroAlAzar.isLeido else comunicaLibroAsignadoAlAzar()
+    #envialosleidosaBB para pruebas
     #enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos() if my_shelve["biblioteca"][numeroParaPruebas].isLeido else comunicaLibroAsignadoAlAzar()
 
 def enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos():
     global BBProvisoriaDeIsLeidos
     BBProvisoriaDeIsLeidos.append(Libro(libroAlAzar.numero, libroAlAzar.autor, libroAlAzar.titulo, libroAlAzar.genero, libroAlAzar.seccion, True)) 
+    #BBProvisoria para pruebas
     #BBProvisoriaDeIsLeidos.append(Libro(my_shelve["biblioteca"][numeroParaPruebas].numero, my_shelve["biblioteca"][numeroParaPruebas].autor, my_shelve["biblioteca"][numeroParaPruebas].titulo, my_shelve["biblioteca"][numeroParaPruebas].genero, my_shelve["biblioteca"][numeroParaPruebas].seccion, True)) 
     eligeNumeroAlAzar()
     separaIsLeidos()
@@ -61,6 +66,12 @@ def comunicaLosLibrosLeidosQueSalieron():
         for libro in BBProvisoriaDeIsLeidos:
             print("   -> "+libro.titulo)
         print("")
+        detieneLaFuncionSiHayErrorEnIsLeidos()
+
+def detieneLaFuncionSiHayErrorEnIsLeidos():
+    errorEnIsLeidos = input("Si entre estos libros hay uno que querías leer ahora, ingresa 'Y' para detener el programa: ")
+    if errorEnIsLeidos in yes_choices:
+        print(""), print("Ok, podés leer ese libro entonces, que lo disfrutes."), cierraLaShelve(), despideAlUsuario(), cierraElPrograma()
 
 def comunicaLibroAsignadoAlAzar():
     comunicaLosLibrosLeidosQueSalieron()
@@ -68,15 +79,16 @@ def comunicaLibroAsignadoAlAzar():
     print("")
     print(" "+(libroAlAzar.autor)+", "+(libroAlAzar.titulo)+", "+(libroAlAzar.genero)+", "+((libroAlAzar.seccion)))
     print("")
+    #print para pruebas
     #print("...bien, te salió sorteado el número "+str(numeroParaPruebas)+", al que le corresponde el siguiente libro: ")
     #print("")
     #print(" "+(my_shelve["biblioteca"][numeroParaPruebas].autor)+", "+(my_shelve["biblioteca"][numeroParaPruebas].titulo)+", "+(my_shelve["biblioteca"][numeroParaPruebas].genero)+", "+((my_shelve["biblioteca"][numeroParaPruebas].seccion)))
     
-    yes_choices = ['yes', 'y', 'YES', 'Y', 'Yes', 'Si', 'S', 's', 'si']
+    
     #no_choices = ['no', 'n', 'No', 'N']
     indicaSiVaALeer = input("Según la base de datos, aún no has leído este libro. ¿Vas a leerlo ahora? Y/N: ")
     if indicaSiVaALeer in yes_choices:
-        print(""), print("¡Excelente! Que lo disfrutes."), print(""),
+        print(""), print("¡Excelente! Que lo disfrutes.")
         modificaLibroIsLeido()
     else:
         print(""), print("bueno, elijamos otro..."), print(""), eligeNumeroAlAzar(), separaIsLeidos()
@@ -85,19 +97,26 @@ def modificaLibroIsLeido():
     libroAlAzar.isLeido = True
 
 def cierraLaShelve():
-    my_shelve.close(),
+    my_shelve.close()
     
 def despideAlUsuario():
     print("")
-    input("cerrando el programa, espero que te haya servido. presiona Enter para salir.")
+    input("Cerrando el programa, espero que te haya servido. presiona enter para terminar.")
+    cierraElPrograma()
 
-#randomBB
-saludaAlUsuario(),
-abreLaShelve(),
-eligeNumeroAlAzar(),
-separaIsLeidos(),
-cierraLaShelve(),
-despideAlUsuario(),
+def cierraElPrograma():
+    exit(0)
+
+
+if __name__ == "__main__":
+    saludaAlUsuario(),
+    abreLaShelve(),
+    eligeNumeroAlAzar(),
+    separaIsLeidos(),
+    cierraLaShelve(),
+    despideAlUsuario(),
+    cierraElPrograma(),
+
 
 
 
