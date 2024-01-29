@@ -1,12 +1,14 @@
 import shelve
 import openpyxl
 from random import randrange
+import os
+import time
 
-#variables de openpyxl, no se usan salvo que cambie el excel, en ese caso revisar abajo de todo.
-path = "C:/Users/usuario/Desktop/ariel/Hackerwoman/Proyectos/randomBB/biblioteca.xlsx"
+"""variables de openpyxl, no se usan salvo que cambie el excel, en ese caso revisar abajo de todo.
+path = "C:/...path/bibliotecaDeEjemplo.xlsx"
 wb_obj = openpyxl.load_workbook(path)
 sheet_obj = wb_obj.active
-m_row = sheet_obj.max_row
+m_row = sheet_obj.max_row"""
 
 #objeto y lista de objetos
 class Libro:
@@ -23,10 +25,16 @@ BBProvisoriaDeIsLeidos = []
 numeroAlAzar = 0
 yes_choices = ['yes', 'y', 'YES', 'Y', 'Yes', 'Si', 'S', 's', 'si']
 
+
+def print_slow(str):
+    for letter in str:
+        print(letter, end='', flush=True)
+        time.sleep(0.01)
+
 def saludaAlUsuario():
     print("")
-    input("Hola, vamos a elegir un número al azar y elegir un libro de la biblioteca, presiona enter para continuar")
-    print("")
+    print_slow("\n Hola, vamos a usar un número al azar para elegir un libro de la biblioteca, presiona enter para continuar \n")
+    input("")    
 
 def abreLaShelve():
     global my_shelve
@@ -46,36 +54,35 @@ def separaIsLeidos():
 
 def enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos():
     global BBProvisoriaDeIsLeidos
-    BBProvisoriaDeIsLeidos.append(Libro(libroAlAzar.numero, libroAlAzar.autor, libroAlAzar.titulo, libroAlAzar.genero, libroAlAzar.seccion, True)) 
+    BBProvisoriaDeIsLeidos.append(libroAlAzar) 
     eligeNumeroAlAzar()
     separaIsLeidos()
 
 def comunicaLosLibrosLeidosQueSalieron():
     if any(BBProvisoriaDeIsLeidos):
-        print("...bueno, primero salieron estos libros, que ya leiste")
+        print_slow("\n ...bueno, primero salieron estos libros, que ya leiste \n")
         for libro in BBProvisoriaDeIsLeidos:
             print("   -> "+libro.titulo)
-        print("")
         detieneLaFuncionSiHayErrorEnIsLeidos()
 
 def detieneLaFuncionSiHayErrorEnIsLeidos():
-    errorEnIsLeidos = input("Si entre estos libros hay uno que querías leer ahora, ingresa 'Y' para detener el programa: ")
+    errorEnIsLeidos = input("\n Si entre estos libros hay uno que querías leer ahora, ingresa 'Y' para detener el programa: \n")
     if errorEnIsLeidos in yes_choices:
-        print(""), print("Ok, podés leer ese libro entonces, que lo disfrutes."), cierraLaShelve(), despideAlUsuario(), cierraElPrograma()
+        print_slow("\n Ok, podés leer ese libro entonces, que lo disfrutes. \n"), cierraLaShelve(), despideAlUsuario(), cierraElPrograma()
 
 def comunicaLibroAsignadoAlAzar():
     comunicaLosLibrosLeidosQueSalieron()
-    print("...bien, luego te salió sorteado el número "+str(numeroAlAzar)+", al que le corresponde el siguiente libro: ")
-    print("")
-    print(" "+(libroAlAzar.autor)+", "+(libroAlAzar.titulo)+", "+(libroAlAzar.genero)+", "+((libroAlAzar.seccion)))
-    print("")
+    print_slow("\n ...sin contar libros ya leídos, te salió sorteado el número "+str(numeroAlAzar)+", al que le corresponde el siguiente libro: \n")
+    print_slow(f"""{libroAlAzar.autor}, {libroAlAzar.titulo}, {libroAlAzar.genero}, {libroAlAzar.seccion}\n""")
     
-    indicaSiVaALeer = input("Según la base de datos, aún no has leído este libro. ¿Vas a leerlo ahora? Y/N: ")
+    
+    indicaSiVaALeer = input("\n Según la base de datos, aún no has leído este libro. ¿Vas a leerlo ahora? Y/N: ")
     if indicaSiVaALeer in yes_choices:
-        print(""), print("¡Excelente! Que lo disfrutes.")
+        print_slow("\n ¡Excelente! Que lo disfrutes.\n")
         modificaLibroIsLeido()
     else:
-        print(""), print("bueno, elijamos otro..."), print(""), eligeNumeroAlAzar(), separaIsLeidos()
+        os.system('cls')
+        print("\n bueno, elijamos otro...\n"), eligeNumeroAlAzar(), separaIsLeidos()
 
 def modificaLibroIsLeido():
     libroAlAzar.isLeido = True
@@ -84,7 +91,7 @@ def cierraLaShelve():
     my_shelve.close()
     
 def despideAlUsuario():
-    print(""), input("Cerrando el programa, espero que te haya servido. presiona enter para terminar.")
+    input("\n Cerrando el programa, espero que te haya servido. presiona enter para terminar.\n")
     cierraElPrograma()
 
 def cierraElPrograma():
