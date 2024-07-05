@@ -4,14 +4,18 @@ from random import randrange
 import os
 import time
 
-"""variables de openpyxl, no se usan salvo que cambie el excel, en ese caso revisar abajo de todo."""
-###path = "C:/...path/bibliotecaDeEjemplo.xlsx"
+# openpyxl configuration
+
+# path of the folder where the xlsx is
+# path = "C:/.../bibioteca.xlsx"
 path = "C:/coso/Desktold/Hackerwoman/praxis/proyectos/randomBB/biblioteca.xlsx"
 wb_obj = openpyxl.load_workbook(path)
 sheet_obj = wb_obj.active
 m_row = sheet_obj.max_row
 
-#objeto y lista de objetos
+
+# 'libro' (book) object and list initialization.
+
 class Libro:
     def __init__(self, numero, autor, titulo, genero, seccion, isLeido):
         self.numero = numero
@@ -21,54 +25,56 @@ class Libro:
         self.seccion = seccion
         self.isLeido = isLeido
 
+# bilioteca is used the first time to create de database. Read lines from 239
 biblioteca = []
 BBProvisoriaDeIsLeidos = []
-numeroAlAzar = 0
 yes_choices = ['yes', 'y', 'YES', 'Y', 'Yes', 'Si', 'S', 's', 'si']
-
-
 
 def print_slow(str):
     for letter in str:
         print(letter, end='', flush=True)
         time.sleep(0.005)
 
-
+    
+######################################################    
+################## Shelve and Excel ##################
+######################################################
 
 def abreLaShelve():
-    global my_shelve
-    #el writeback=true supuestamente no es necesario y ralentiza el programa
-    #sin embargo, cuando no lo puse, sencillamente no pude modificar la shelve
+    # writeback=true: allegedly unnecesary and slowing-down the program. 
+    # neverdeless, if it was not put there, i couldn't modify the shelve
     my_shelve = shelve.open("mydata.db", writeback=True)
-    
-   
-def saludaAlUsuario():
-    print("")
-    print_slow("\n Hola, vamos a usar un número al azar para elegir un libro de la biblioteca, presiona enter para continuar \n")
-    input("")    
-    
+    return my_shelve
+
 def pruebaShelveContraExcel():
-    # print("len de myshelve[bibioteca]: ", len(my_shelve["biblioteca"]))
-    # print("ultimo elemento de myshelve: ", my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].numero, " | ", my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].autor, my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].titulo, " | ", my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].genero, " | ", my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].seccion, " | ", my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].isLeido)
-    # print("filas del excel: ",  m_row)
-    # print("ultimo del excel: ",  sheet_obj.cell(row = m_row, column = 3).value)
-    # dejo este comando de ejemplo para modificar un registro de la shelve
-    # demy_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].seccion = "Literatura estadounidense"
-        
-    ###revisa diferencia entre shelve y filas del excel
+    
+    # these are just a bunch of useful methods for debugging 
+    # print("len of myshelve[bibioteca]: ", len(my_shelve["biblioteca"]))
+    # print("last element of myshelve: ", my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].numero, " | ", my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].autor, my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].titulo, " | ", my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].genero, " | ", my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].seccion, " | ", my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].isLeido)
+    # print("rows of excel: ",  m_row)
+    # print("last record of excel: ",  sheet_obj.cell(row = m_row, column = 3).value)
+    
+    # i'll leave this method here as example of how to edit a register in the shelve
+    # my_shelve["biblioteca"][len(my_shelve["biblioteca"])-1].seccion = "Literatura estadounidense" 
+    
+    
+    # boolean: checks if records are uneven bewteen excel and shelve
     hayNuevosLibros = (len(my_shelve["biblioteca"]) != m_row)
     
+    # if not, that means used added new records to excel
     if hayNuevosLibros:
+
+        # (int) establish the amount of new records
         cantidadNueva = m_row - len(my_shelve["biblioteca"])
-        
+        # alert the user and print detailed list:
         print_slow(f"Atención!! se ha detectado que el excel tiene {cantidadNueva} nuevo libro: \n\n") if cantidadNueva == 1 else print_slow(f"Atención!! se ha detectado que el excel tiene {cantidadNueva} nuevos libros: \n\n")
-        
         aux = 1
         for x in range(cantidadNueva):
             mensaje = str(sheet_obj.cell(row = (m_row-cantidadNueva+aux), column = 2).value + sheet_obj.cell(row = (m_row-cantidadNueva+aux), column = 3).value + "\n")
             print_slow(mensaje)
             aux += 1
     
+        # gives user the chance of update database or go ahead without adding new records
         ingresar = input("\n Si querés que los agreguemos a la base de datos ahora, ingresa 'Y': \n")
         if ingresar in yes_choices:
             os.system('cls')
@@ -79,17 +85,23 @@ def pruebaShelveContraExcel():
             print_slow("\n Ok, continuemos entonces... \n")
 
 def agregaLibros(cantidadNueva):
+    # appends as many new objects as "cantidad nueva".
+    # the iteration method/arguments are to obtain the "self.numero" column and start there
     for i in range(m_row-cantidadNueva+1, m_row+1):
         my_shelve["biblioteca"].append(Libro(i, "autor", "titulo", "genero", "seccion", False))
         
-    ###itera las columnas
+    # then using again the same itration method/arguments... (probably could fusion both iterations)
+    # 1. declare values from excel cells as variables
     for i in range(m_row-cantidadNueva+1, m_row+1):
         autor = sheet_obj.cell(row = i, column = 2)
         titulo = sheet_obj.cell(row = i, column = 3)
         genero = sheet_obj.cell(row = i, column = 4)
         seccion = sheet_obj.cell(row = i, column = 5)
-        # modifica los atributos de cada elemento de [biblioteca]. el índice es -1 porque "i"
-        # aquí remite a n° de libro en el excel que arranca en 1, no en 0
+        
+        # 2. use this variables as attributes of the new objects
+        
+        # index is -1 because "i" here refers to the self.numero column, which is not in base 0 but 1.
+        # case the user didn't fill one of the columns, the program fills that column with "..." 
         if(autor.value):
             my_shelve["biblioteca"][i-1].autor = str(autor.value)
         else:
@@ -107,8 +119,8 @@ def agregaLibros(cantidadNueva):
         else:
             my_shelve["biblioteca"][i-1].seccion = "..."
     
+    # print when success
     print_slow(f"Se ha agregado con éxito el siguiente libro: \n\n") if cantidadNueva == 1 else print_slow(f"Se han agregado con éxito los siguientes libros: \n\n")
-
     aux = 1
     for i in range(m_row-cantidadNueva+1, m_row+1):
         mensaje = str(str(my_shelve["biblioteca"][i-1].numero) + " | " + my_shelve["biblioteca"][i-1].autor + my_shelve["biblioteca"][i-1].titulo + " | " + my_shelve["biblioteca"][i-1].genero + " | " + my_shelve["biblioteca"][i-1].seccion + " \n")
@@ -118,51 +130,88 @@ def agregaLibros(cantidadNueva):
     print_slow("\n\n Presione cualquier tecla para continuar... \n\n")
     input("")
 
+######################################################    
+################# General Functions ##################
+######################################################
 
+
+def saludaAlUsuario():
+    print_slow("\n Hola, vamos a usar un número al azar para elegir un libro de la biblioteca, presiona enter para continuar \n")
+    input("")
+
+# returns random Number
 def eligeNumeroAlAzar():
-    global numeroAlAzar
-    global libroAlAzar
-
     numeroAlAzar = randrange(len(my_shelve["biblioteca"])+1)
-    libroAlAzar = my_shelve["biblioteca"][numeroAlAzar]
+    return numeroAlAzar
     
-def separaIsLeidos():
-    enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos() if libroAlAzar.isLeido else comunicaLibroAsignadoAlAzar()
+# returns random book object (Libro)
+def eligeLibroAlAzar(numeroAlAzar):
+    libroAlAzar = my_shelve["biblioteca"][numeroAlAzar]
+    return libroAlAzar
 
-def enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos():
-    global BBProvisoriaDeIsLeidos
+
+# recursive: if the book is read (.isLeido), append it to a temporary library (BBProvisoria) and choose
+# another random number and book.
+# otherwise, continue with the program
+def separaIsLeidos(numeroAlAzar, libroAlAzar):
+    if libroAlAzar.isLeido:
+        enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos(libroAlAzar)
+    else:
+        comunicaLibroAsignadoAlAzar(numeroAlAzar, libroAlAzar)
+
+def enviaTodosLosIsLeidoABBProvisoriaDeIsLeidos(libroAlAzar):
     BBProvisoriaDeIsLeidos.append(libroAlAzar) 
-    eligeNumeroAlAzar()
-    separaIsLeidos()
+    numeroAlAzar = eligeNumeroAlAzar()
+    libroAlAzar = eligeLibroAlAzar(numeroAlAzar)
+    separaIsLeidos(numeroAlAzar, libroAlAzar)
 
+# prints:
+def comunicaLibroAsignadoAlAzar(numeroAlAzar, libroAlAzar):
+    #1: already read ("isLeido") books (BBProvisoriaDeIsLeidos)
+    comunicaLosLibrosLeidosQueSalieron()
+    #2: current random number and random book w/ detail:
+    print_slow("\n ...salió sorteado el número "+str(numeroAlAzar)+", al que le corresponde el siguiente libro: \n")
+    print_slow(f"""{libroAlAzar.autor}, {libroAlAzar.titulo}, {libroAlAzar.genero}, {libroAlAzar.seccion}\n""")
+
+# CASE A: first random book has not been read (isLeido = False)
+# Recursive: The user accepts to read this book or choose another.
+def aceptaLibroOPideOtro(libroAlAzar):
+    indicaSiVaALeer = input("\n Según la base de datos, aún no has leído este libro. ¿Vas a leerlo ahora? Y/N: ")
+    if indicaSiVaALeer in yes_choices:
+        print_slow("\n ¡Excelente! Que lo disfrutes.\n")
+        modificaLibroIsLeido(libroAlAzar)
+    else:
+        os.system('cls')
+        print("\n bueno, elijamos otro...\n")
+        BBProvisoriaDeIsLeidos.clear()
+        numeroAlAzar = eligeNumeroAlAzar()
+        libroAlAzar = eligeLibroAlAzar(numeroAlAzar)
+        separaIsLeidos(numeroAlAzar, libroAlAzar)
+        aceptaLibroOPideOtro(libroAlAzar)
+
+# CASE B: At least one book already read was first selected.
 def comunicaLosLibrosLeidosQueSalieron():
     if any(BBProvisoriaDeIsLeidos):
         print_slow("\n ...bueno, primero salieron estos libros, que ya leiste \n")
         for libro in BBProvisoriaDeIsLeidos:
             print("   -> "+libro.titulo)
-        detieneLaFuncionSiHayErrorEnIsLeidos()
+        detieneLaFuncionSiHayErrorEnIsLeidos()   
 
+# this function stops the program if user wants to read a book in the temporary list of already read book
+# (maybe a re-read or maybe a wrong record). no need for futher alteration because the output alreay is 
+# the expected: random book has isLeido atribute as True.
 def detieneLaFuncionSiHayErrorEnIsLeidos():
     errorEnIsLeidos = input("\n Si entre estos libros hay uno que querías leer ahora, ingresa 'Y' para detener el programa: \n")
     if errorEnIsLeidos in yes_choices:
-        print_slow("\n Ok, podés leer ese libro entonces, que lo disfrutes. \n"), cierraLaShelve(), despideAlUsuario(), cierraElPrograma()
+        print_slow("\n Ok, podés leer ese libro entonces, que lo disfrutes. \n")
+        cierraLaShelve()
+        despideAlUsuario()
+        cierraElPrograma()
 
-def comunicaLibroAsignadoAlAzar():
-    comunicaLosLibrosLeidosQueSalieron()
-    print_slow("\n ...sin contar libros ya leídos, te salió sorteado el número "+str(numeroAlAzar)+", al que le corresponde el siguiente libro: \n")
-    print_slow(f"""{libroAlAzar.autor}, {libroAlAzar.titulo}, {libroAlAzar.genero}, {libroAlAzar.seccion}\n""")
-    
-    
-    indicaSiVaALeer = input("\n Según la base de datos, aún no has leído este libro. ¿Vas a leerlo ahora? Y/N: ")
-    if indicaSiVaALeer in yes_choices:
-        print_slow("\n ¡Excelente! Que lo disfrutes.\n")
-        modificaLibroIsLeido()
-    else:
-        os.system('cls')
-        print("\n bueno, elijamos otro...\n"), eligeNumeroAlAzar(), separaIsLeidos()
-
-def modificaLibroIsLeido():
-    libroAlAzar.isLeido = True
+# Update column "isLeido" (already read) to True
+def modificaLibroIsLeido(libroAlAzar):
+    my_shelve["biblioteca"][libroAlAzar.numero-1].isLeido = True
+    print(f'\n Modificada la condición de "{my_shelve["biblioteca"][libroAlAzar.numero-1].titulo}" a leido: {my_shelve["biblioteca"][libroAlAzar.numero-1].isLeido}')
 
 def cierraLaShelve():
     my_shelve.close()
@@ -175,65 +224,55 @@ def cierraElPrograma():
     exit(0)
 
 if __name__ == "__main__":
-    abreLaShelve(),
-    saludaAlUsuario(),
-    pruebaShelveContraExcel(),
-    eligeNumeroAlAzar(),
-    separaIsLeidos(),
-    cierraLaShelve(),
-    despideAlUsuario(),
-    cierraElPrograma(),
+    my_shelve = abreLaShelve()
+    saludaAlUsuario()
+    pruebaShelveContraExcel()
+    numeroAlAzar = eligeNumeroAlAzar()
+    libroAlAzar = eligeLibroAlAzar(numeroAlAzar)
+    separaIsLeidos(numeroAlAzar, libroAlAzar)
+    aceptaLibroOPideOtro(libroAlAzar)
+    cierraLaShelve()
+    despideAlUsuario()
+    cierraElPrograma()
 
-
-
-"""método general para crear una lista, tomar todos los datos del excel y guardarlos en la shelve
-### crea la lista de objetos
-
-for i in range(870):
-    biblioteca.append(Libro(i+1, "autor", "titulo", "genero", "seccion", False))
-
-###itera la columna 2
-for i in range(1, m_row + 1):
-    cell_obj = sheet_obj.cell(row = i, column = 2)
-    ###modifica el atributo "autor" de cada elemento de [biblioteca]
-    if(cell_obj.value):
-        biblioteca[i-1].autor = str(cell_obj.value)
-    else:
-        biblioteca[i-1].autor = "..."
     
-    ###print(str(biblioteca[i-1].numero)+biblioteca[i-1].autor)
+######################################################    
+######## Creating and populating the Database ########
+############## using data from a xlsx ################
+#### uncomment when using this program first time ####
+######################################################
 
-###itera la columna 3
-for i in range(1, m_row + 1):
-    cell_obj = sheet_obj.cell(row = i, column = 3)
-    ###modifica el atributo "autor" de cada elemento de [biblioteca]
-    if(cell_obj.value):
-        biblioteca[i-1].titulo = str(cell_obj.value)
-    else:
-        biblioteca[i-1].titulo = "..."
+"""
+for i in range(m_row):
 
-###itera la columna 4
-for i in range(1, m_row + 1):
-    cell_obj = sheet_obj.cell(row = i, column = 4)
-    ###modifica el atributo "autor" de cada elemento de [biblioteca]
-    if(cell_obj.value):
-        biblioteca[i-1].genero = str(cell_obj.value)
-    else:
-        biblioteca[i-1].genero = "..."
+        biblioteca.append(Libro(i+1, "autor", "titulo", "genero", "seccion", False))
+                
+        autor = sheet_obj.cell(row = i+1, column = 2)
+        titulo = sheet_obj.cell(row = i+1, column = 3)
+        genero = sheet_obj.cell(row = i+1, column = 4)
+        seccion = sheet_obj.cell(row = i+1, column = 5)
+        
+        if(autor.value):
+            my_shelve["biblioteca"][i-1].autor = str(autor.value)
+        else:
+            my_shelve["biblioteca"][i-1].autor = "..."
+        if(titulo.value):
+            my_shelve["biblioteca"][i-1].titulo = str(titulo.value)
+        else:
+            my_shelve["biblioteca"][i-1].titulo = "..."
+        if(genero.value):
+            my_shelve["biblioteca"][i-1].genero = str(genero.value)
+        else:
+            my_shelve["biblioteca"][i-1].genero = "..."
+        if(seccion.value):
+            my_shelve["biblioteca"][i-1].seccion = str(seccion.value)
+        else:
+            my_shelve["biblioteca"][i-1].seccion = "..."
 
-###itera la columna 5
-for i in range(1, m_row + 1):
-    cell_obj = sheet_obj.cell(row = i, column = 5)
-    ###modifica el atributo "autor" de cada elemento de [biblioteca]
-    if(cell_obj.value):
-        biblioteca[i-1].seccion = str(cell_obj.value)
-    else:
-        biblioteca[i-1].seccion = "..."
-
-### asigna la lista a la shelve
+# assigns to shelve
 my_shelve["biblioteca"] = biblioteca
 
-### iprime la lista guardada en la shelve con dos valores: número y autor
+# prints it all
 for libro in my_shelve["biblioteca"]:
     print(str(libro.numero)+", "+(libro.autor)+", "+(libro.titulo)+", "+((my_shelve["y"]).genero)+", "+((my_shelve["y"]).seccion)+", "+str(((my_shelve["y"]).isLeido)))"""
 
