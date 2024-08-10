@@ -7,8 +7,8 @@ import time
 # openpyxl configuration
 
 # path of the folder where the xlsx is
-# path = "C:/.../bibioteca.xlsx"
-path = "C:/coso/Desktold/Hackerwoman/praxis/proyectos/randomBB/biblioteca.xlsx"
+path = "C:/.../bibioteca.xlsx"
+
 wb_obj = openpyxl.load_workbook(path)
 sheet_obj = wb_obj.active
 m_row = sheet_obj.max_row
@@ -223,27 +223,23 @@ def despideAlUsuario():
 def cierraElPrograma():
     exit(0)
 
-if __name__ == "__main__":
-    my_shelve = abreLaShelve()
-    saludaAlUsuario()
-    pruebaShelveContraExcel()
-    numeroAlAzar = eligeNumeroAlAzar()
-    libroAlAzar = eligeLibroAlAzar(numeroAlAzar)
-    separaIsLeidos(numeroAlAzar, libroAlAzar)
-    aceptaLibroOPideOtro(libroAlAzar)
-    cierraLaShelve()
-    despideAlUsuario()
-    cierraElPrograma()
-
-    
 ######################################################    
 ######## Creating and populating the Database ########
 ############## using data from a xlsx ################
-#### uncomment when using this program first time ####
 ######################################################
 
-"""
-for i in range(m_row):
+def crearBiblioteca():
+    if (biblioteca): {
+        print('hay biblioteca')
+    }
+    else: {
+        print('no hay biblioteca!')
+    }
+        
+    # assigns to shelve
+    my_shelve["biblioteca"] = biblioteca
+
+    for i in range(m_row):
 
         biblioteca.append(Libro(i+1, "autor", "titulo", "genero", "seccion", False))
                 
@@ -269,11 +265,26 @@ for i in range(m_row):
         else:
             my_shelve["biblioteca"][i-1].seccion = "..."
 
-# assigns to shelve
-my_shelve["biblioteca"] = biblioteca
+    
 
-# prints it all
-for libro in my_shelve["biblioteca"]:
-    print(str(libro.numero)+", "+(libro.autor)+", "+(libro.titulo)+", "+((my_shelve["y"]).genero)+", "+((my_shelve["y"]).seccion)+", "+str(((my_shelve["y"]).isLeido)))"""
+    # prints it all
+    for libro in my_shelve["biblioteca"]:
+        print(str(libro.numero)+", "+(libro.autor)+", "+(libro.titulo)+", "+(libro.genero)+", "+(libro.seccion)+", "+str(libro.isLeido))
+
+if __name__ == "__main__":
+    my_shelve = abreLaShelve()
+    crearBiblioteca()
+    saludaAlUsuario()
+    pruebaShelveContraExcel()
+    numeroAlAzar = eligeNumeroAlAzar()
+    libroAlAzar = eligeLibroAlAzar(numeroAlAzar)
+    separaIsLeidos(numeroAlAzar, libroAlAzar)
+    aceptaLibroOPideOtro(libroAlAzar)
+    cierraLaShelve()
+    despideAlUsuario()
+    cierraElPrograma()
+
+    
+
 
 
