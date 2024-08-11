@@ -8,7 +8,6 @@ import time
 
 # path of the folder where the xlsx is
 path = "C:/.../bibioteca.xlsx"
-
 wb_obj = openpyxl.load_workbook(path)
 sheet_obj = wb_obj.active
 m_row = sheet_obj.max_row
@@ -229,23 +228,24 @@ def cierraElPrograma():
 ######################################################
 
 def crearBiblioteca():
-    if (my_shelve["biblioteca"]): 
-        print('biblioteca hallada, listo para operar')
-    else:    
-        print('no se ha encontrado bibioteca, preparándose para armar una...');
-           
+    if my_shelve:
+        print('')
+    else:
+        print_slow(f'\n\nNo hay biblioteca en la base de datos! vamos a crear una a partir del archivo biblioteca.xlsx')
+        input(f'\n\n(El archivo debería encontrarse ubicado en {path})')
+            
         # assigns to shelve
         my_shelve["biblioteca"] = biblioteca
 
         for i in range(m_row):
 
             biblioteca.append(Libro(i+1, "autor", "titulo", "genero", "seccion", False))
-                    
+                        
             autor = sheet_obj.cell(row = i+1, column = 2)
             titulo = sheet_obj.cell(row = i+1, column = 3)
             genero = sheet_obj.cell(row = i+1, column = 4)
             seccion = sheet_obj.cell(row = i+1, column = 5)
-            
+                
             if(autor.value):
                 my_shelve["biblioteca"][i-1].autor = str(autor.value)
             else:
@@ -263,11 +263,13 @@ def crearBiblioteca():
             else:
                 my_shelve["biblioteca"][i-1].seccion = "..."
 
-        
-
+            
         # prints it all
         for libro in my_shelve["biblioteca"]:
             print(str(libro.numero)+", "+(libro.autor)+", "+(libro.titulo)+", "+(libro.genero)+", "+(libro.seccion)+", "+str(libro.isLeido))
+        
+        print_slow(f'Construida biblioteca con {len(my_shelve["biblioteca"])} libros. Continuemos')
+        input('')
           
 
 if __name__ == "__main__":
