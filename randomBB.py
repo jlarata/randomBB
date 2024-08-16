@@ -8,6 +8,7 @@ import time
 
 # path of the folder where the xlsx is
 path = "C:/.../bibioteca.xlsx"
+
 wb_obj = openpyxl.load_workbook(path)
 sheet_obj = wb_obj.active
 m_row = sheet_obj.max_row
@@ -69,8 +70,16 @@ def pruebaShelveContraExcel():
         print_slow(f"Atención!! se ha detectado que el excel tiene {cantidadNueva} nuevo libro: \n\n") if cantidadNueva == 1 else print_slow(f"Atención!! se ha detectado que el excel tiene {cantidadNueva} nuevos libros: \n\n")
         aux = 1
         for x in range(cantidadNueva):
-            mensaje = str(sheet_obj.cell(row = (m_row-cantidadNueva+aux), column = 2).value + sheet_obj.cell(row = (m_row-cantidadNueva+aux), column = 3).value + "\n")
-            print_slow(mensaje)
+            if(sheet_obj.cell(row = (m_row-cantidadNueva+aux), column = 2).value): 
+                author = str(sheet_obj.cell(row = (m_row-cantidadNueva+aux), column = 2).value)
+            else:
+                author = '???'
+            if(sheet_obj.cell(row = (m_row-cantidadNueva+aux), column = 3).value): 
+                title = str(sheet_obj.cell(row = (m_row-cantidadNueva+aux), column = 3).value)
+            else:
+                title = '???'
+            mensaje = author+' '+title + "\n"
+            print(mensaje)
             aux += 1
     
         # gives user the chance of update database or go ahead without adding new records
@@ -123,10 +132,10 @@ def agregaLibros(cantidadNueva):
     aux = 1
     for i in range(m_row-cantidadNueva+1, m_row+1):
         mensaje = str(str(my_shelve["biblioteca"][i-1].numero) + " | " + my_shelve["biblioteca"][i-1].autor + my_shelve["biblioteca"][i-1].titulo + " | " + my_shelve["biblioteca"][i-1].genero + " | " + my_shelve["biblioteca"][i-1].seccion + " \n")
-        print_slow(mensaje)
+        print(mensaje)
         aux += 1
     
-    print_slow("\n\n Presione cualquier tecla para continuar... \n\n")
+    print("\n\n Presione cualquier tecla para continuar... \n\n")
     input("")
 
 ######################################################    
